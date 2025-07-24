@@ -62,7 +62,8 @@ void kmp(const char* textoAchado, const char* padroes, int linha) {
                 posicaoFinal++; // Ajusta a posição para o final da palavra
             }
             
-            cout << "Padrão encontrado na linha " << linha << " na posição " << posicao << endl;
+            imprimi(textoAchado, posicao + 1, posicaoFinal - 1, linha); // Imprime a palavra encontrada
+
             j = tabelaLPS[j - 1];
             acessouuuuu++; // Incrementa o contador de acessos ao arquivo
             posicao = -1; // Reseta a posição para o próximo padrão
@@ -75,12 +76,14 @@ void kmp(const char* textoAchado, const char* padroes, int linha) {
             posicao = -1; // Reseta a posição se o padrão não for encontrado
         }
     }
-
-
-    // Exemplo de implementação 
-    cout << "Buscando padrões no texto: " << textoAchado << endl;
-    cout << "Padrões: " << padroes << endl;
     
+}
 
+void imprimi(const char* texto, int inicio, int fim, int linha) {
+    cout << "Linha " << linha << ": ";
+    for (int i = inicio; i <= fim; i++) {
+        cout << texto[i];
+    }
+    cout << endl;
 }
 
