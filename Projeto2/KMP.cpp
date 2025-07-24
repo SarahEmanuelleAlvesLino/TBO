@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int acessouuuuu = 0; // Variável global para contar a quantidade de acessos ao arquivo
+//int acessouuuuu = 0; // Variável global para contar a quantidade de acessos ao arquivo
 
 vector<int> criarTabelaLPS(int tamanhoPadrao, const char* padroes) {
     //int tamanhoPadrao = strlen(padroes);
@@ -52,6 +52,16 @@ void kmp(const char* textoAchado, const char* padroes, int linha) {
 
         if (j == tamanhoPadrao) {
             int posicaoFinal = i - 1; // Posição final do padrão encontrado
+            // Ajusta a posição para o início da palavra
+            while(posicao >= 0 && textoAchado[posicao] != ' ' && textoAchado[posicao] != '\n') {
+                posicao--; // Ajusta a posição para o início da palavra
+            }
+
+            //Ajusta a posição para o final da palavra
+            while (posicaoFinal < tamanhoTexto && textoAchado[posicaoFinal] != ' ' && textoAchado[posicaoFinal] != '\n') {
+                posicaoFinal++; // Ajusta a posição para o final da palavra
+            }
+            
             cout << "Padrão encontrado na linha " << linha << " na posição " << posicao << endl;
             j = tabelaLPS[j - 1];
             acessouuuuu++; // Incrementa o contador de acessos ao arquivo

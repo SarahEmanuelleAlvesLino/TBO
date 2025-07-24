@@ -2,7 +2,7 @@
 #include <fstream>
 #include <chrono>
 #include <vector>
-#include <KMP.h>
+#include "KMP.h"
 
 using namespace std;
 int acessouuuuu = 0; // Variável global para contar a quantidade de acessos ao arquivo
@@ -36,6 +36,8 @@ int main(){
                 cout << "|                                                                    |" << endl;
                 cout << "|>> Digite a quantidade de padroes que deseja pesquisar:             | " << endl;
                 int n;
+                cout << "|                                                                    |" << endl;
+                cout << "|>> Quantidade de padroes: ";
                 cin >> n;
                 cin.ignore(); // Limpa o buffer de entrada
                 cout << "|                                                                    |" << endl;
