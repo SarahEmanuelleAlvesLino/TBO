@@ -3,8 +3,9 @@
 
 #include <vector>
 
+extern int acessouuuuu; // Variável global para contar a quantidade de acessos ao arquivo
 
-void kmp(const char* textoAchado, string padroes, int linha);
+void kmp(const char* textoAchado, const char* padroes, int linha);
 
 
 #endif
