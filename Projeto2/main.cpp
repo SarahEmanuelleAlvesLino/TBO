@@ -6,6 +6,7 @@
 
 using namespace std;
 int acessouuuuu = 0; // Variável global para contar a quantidade de acessos ao arquivo
+int valor_total_acessos = 0; // Variável global para contar o total de acessos ao arquivo
 
 int main(){
 
@@ -31,7 +32,7 @@ int main(){
             //KMP
             case 1:{
 
-                cout << endl << "--------------------- KMP ---------------------" << endl;
+                cout << endl << "---------------------------- KMP -------------------------------" << endl;
                 cout << "______________________________________________________________________"<< endl;
                 cout << "|                                                                    |" << endl;
                 cout << "|>> Digite a quantidade de padroes que deseja pesquisar:             | " << endl;
@@ -57,7 +58,7 @@ int main(){
                     //vector<const char*> padroes = {"mort"};
 
                 for(size_t i = 0; i < padroes.size(); i++) {
-                    cout << "Padrão " << i + 1 << ": " << padroes[i] << endl;
+                    cout << "Padrão " << i + 1 << ": " << padroes[i] << endl << endl;
 
                     ifstream arquivo("texto.txt");
                     if(!arquivo.is_open()) {
@@ -77,11 +78,14 @@ int main(){
                     }
 
                     arquivo.close();
-                    cout << "Total de acessos ao arquivo: " << acessouuuuu << endl;
+                    cout << endl <<  "Total de acessos ao arquivo: " << acessouuuuu << endl;
+                    valor_total_acessos += acessouuuuu; // Acumula o total de acessos
                     acessouuuuu = 0; // Reseta o contador de acessos para o próximo padrão
                     cout << endl;
                     
                 }
+                cout << "Soma de todos os acessos ao arquivo: " << valor_total_acessos << endl;
+                cout << "______________________________________________________________________"<< endl << endl;
             }
                 break;
 

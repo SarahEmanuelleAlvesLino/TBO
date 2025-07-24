@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstring>
 #include <vector>
+#include <cctype>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ vector<int> criarTabelaLPS(int tamanhoPadrao, const char* padroes) {
     int i = 1;
 
     while (i < tamanhoPadrao) {
-        if (padroes[i] == padroes[comprimento]) {
+        if (tolower(padroes[i]) == tolower(padroes[comprimento])) {
             comprimento++;
             tabelaLPS[i] = comprimento;
             i++;
@@ -36,13 +37,18 @@ void kmp(const char* textoAchado, const char* padroes, int linha) {
     int tamanhoTexto = strlen(textoAchado);
     int tamanhoPadrao = strlen(padroes);
 
+    if (tamanhoPadrao == 0) {
+        cout << "Padrão vazio, nada a pesquisar." << endl;
+        return;
+    }
+
     vector<int> tabelaLPS = criarTabelaLPS(tamanhoPadrao, padroes);
     int i = 0; // Índice para o texto
     int j = 0; // Índice para o padrão
     int posicao = -1; // Posição do padrão encontrado
 
     for(i = 0; i < tamanhoTexto;) {
-        if (padroes[j] == textoAchado[i]) {
+        if (tolower(padroes[j]) == tolower(textoAchado[i])) {
             if(posicao == -1) {
                 posicao = i; // Armazena a posição do primeiro caractere do padrão encontrado
             }
@@ -67,7 +73,7 @@ void kmp(const char* textoAchado, const char* padroes, int linha) {
             j = tabelaLPS[j - 1];
             acessouuuuu++; // Incrementa o contador de acessos ao arquivo
             posicao = -1; // Reseta a posição para o próximo padrão
-        } else if (i < tamanhoTexto && padroes[j] != textoAchado[i]) {
+        } else if (i < tamanhoTexto && tolower(padroes[j]) != tolower(textoAchado[i])) {
             if (j != 0) {
                 j = tabelaLPS[j - 1];
             } else {
@@ -80,7 +86,7 @@ void kmp(const char* textoAchado, const char* padroes, int linha) {
 }
 
 void imprimi(const char* texto, int inicio, int fim, int linha) {
-    cout << "Linha " << linha << ": ";
+    cout << "\tLinha " << linha << ": ";
     for (int i = inicio; i <= fim; i++) {
         cout << texto[i];
     }
