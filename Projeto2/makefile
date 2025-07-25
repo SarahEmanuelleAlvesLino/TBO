@@ -6,7 +6,7 @@
 MAIN := main
 
 # Lista de objetos
-OBJECTS := $(MAIN).o KMP.o
+OBJECTS := $(MAIN).o KMP.o ahoCorasick.o
 
 # Flags de compilação
 FLAGS := -Wall -Wextra -std=c++17 -pedantic-errors
@@ -31,11 +31,14 @@ $(OUTPUTMAIN): $(OBJECTS)
 	$(CC) $(FLAGS) $(DEBUG) $(OBJECTS) -o $(OUTPUTMAIN)
 
 # Regras de compilação para cada arquivo
-main.o: main.cpp KMP.h
+main.o: main.cpp KMP.h ahoCorasick.h
 	$(CC) $(FLAGS) $(DEBUG) -c main.cpp
 
 KMP.o: KMP.cpp KMP.h
 	$(CC) $(FLAGS) $(DEBUG) -c KMP.cpp
+
+ahoCorasick.o: ahoCorasick.cpp ahoCorasick.h
+	$(CC) $(FLAGS) $(DEBUG) -c ahoCorasick.cpp
 
 # Limpeza dos arquivos objetos e executável
 clean:

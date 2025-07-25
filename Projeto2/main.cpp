@@ -3,6 +3,7 @@
 #include <chrono>
 #include <vector>
 #include "KMP.h"
+#include "aho_Corasick.h"
 
 using namespace std;
 int acessouuuuu = 0; // Variável global para contar a quantidade de acessos ao arquivo
@@ -91,6 +92,29 @@ int main(){
 
             //Aho-Corasick
             case 2:{
+                cout << endl << "---------------------------- Aho-Corasick -------------------------------" << endl;
+                cout << "______________________________________________________________________"<< endl;
+                cout << "|                                                                    |" << endl;
+                cout << "| O Aho-Corasick busca todos os padrões de uma vez só                |" << endl;
+                cout << "|                                                                    |" << endl;
+                cout << "|>> Digite a quantidade de padroes que deseja pesquisar:             | " << endl;
+                int n;
+                cout << "|                                                                    |" << endl;
+                cout << "|>> Quantidade de padroes: ";
+                cin >> n;
+                cin.ignore(); // Limpa o buffer de entrada
+                cout << "|                                                                    |" << endl;
+                cout << "|>> Digite o(s) padrao(s) que deseja pesquisar:                      | " << endl;
+                cout << "|                                                                    |" << endl;
+                vector<string> padroes(n);
+                    for(int i = 0; i < n; i++){
+                        cout << "|>> Padrão " << i+1 << ": ";
+                        getline(cin, padroes[i]);
+                    }
+                cout << "|                                                                    |" << endl;
+                cout << "|____________________________________________________________________|" << endl;
+
+                executa_AhoCorasick("texto.txt", padroes);
 
             }
                 break;
