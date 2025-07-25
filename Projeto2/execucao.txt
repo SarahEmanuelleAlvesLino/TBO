@@ -1,0 +1,13 @@
+COMPACTAÇÃO DO ARQUIVO:
+
+valgrind ./huffman C input1.txt output1.huff
+
+
+DESCOMPACTAÇÃO DO ARQUIVO:
+
+valgrind ./huffman D output1.huff output1.txt
+
+
+COMPARAÇÃO DE RESULTADOS:
+
+diff input1.txt output1.txt
