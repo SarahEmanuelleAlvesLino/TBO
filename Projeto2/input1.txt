@@ -1,0 +1,258 @@
+Medição de Acoplamento e Coesão em Sistemas Orientados a Objetos
+Martin Hitz, Behzad Montazeri
+Instituto de Informática Aplicada e Análise de Sistemas, Universidade de Viena hitz@ifs.univie.ac.at
+Resumo - Como o papel das métricas de software, em geral, e do acoplamento, em particular, na manutenção de produtos de software é amplamente aceito, são avaliadas abordagens atuais para lidar com acoplamento e/ou coesão em sistemas orientados a objetos. Tendo identificado algumas inadequações, fornecemos uma estrutura abrangente para lidar com todos os tipos de acoplamento.
+Essa estrutura leva em consideração a distinção entre acoplamento a nível de objeto e a nível de classe. Essa distinção refere-se às dependências dinâmicas entre objetos, por um lado, e dependências estáticas entre implementações, por outro, representando aspectos importantes da qualidade do software em tempo de execução e durante a fase de manutenção, respectivamente.
+No que diz respeito à coesão, analisamos uma métrica bem conhecida apresentada por Chidamber e Kemerer e reformulada por Li e Henry. Como resultado, apresentamos uma versão melhorada dessa métrica baseada em teoria dos grafos.
+Palavras-chave - Programação orientada a objetos, métricas de software, teoria da medição, acoplamento, coesão, manutenção de software.
+I. INTRODUÇÃO
+Tentar controlar a qualidade do software – e todos os atributos relacionados, como confiabilidade, manutenibilidade, usabilidade, entre outros – exige medições para avaliar até que ponto esses atributos são alcançados em determinado produto. Tais medições são valiosas tanto para uma análise a posteriori de um produto finalizado quanto, mais importante ainda, para orientar o processo de desenvolvimento desde o início, evitando resultados indesejáveis.
+Nesse contexto, muitas métricas de software foram estabelecidas no passado, principalmente na área de design tradicional de software estruturado. No entanto, nos últimos anos, diversas críticas aos fundamentos metodológicos da medição de software foram publicadas, desafiando algumas das métricas previamente definidas. Além disso, com a ascensão do paradigma orientado a objetos, surgiram ainda mais dificuldades na aplicação de métricas tradicionais a sistemas orientados a objetos.
+Assim, qualquer tentativa de definir uma métrica para software orientado a objetos deve levar em consideração:
+* Os fundamentos gerais da teoria da medição.
+* As características específicas do software orientado a objetos.
+Com relação ao primeiro requisito, acreditamos que, além das diretrizes teóricas de medição já publicadas, duas regras importantes devem ser seguidas ao tentar medir atributos internos do produto:
+1. Os atributos a serem medidos devem ter influência causal sobre algum atributo externo.
+2. A métrica correspondente deve preservar todas as relações empíricas amplamente aceitas.
+No design estruturado e na programação, a importância do acoplamento e da coesão como principais atributos relacionados à qualidade da decomposição é amplamente reconhecida. Especialistas em engenharia de software asseguram que designs com baixo acoplamento e alta coesão resultam em produtos mais confiáveis e fáceis de manter. Desde os primórdios desse paradigma de design, os diferentes tipos de comunicação entre módulos foram discutidos e classificados de acordo com seus impactos na qualidade do design.
+Essa métrica ordinal foi amplamente aceita, embora tenha levado muito tempo para que uma métrica numérica fosse proposta para esse atributo. Em resumo, a seguinte lista apresenta os diferentes tipos de acoplamento em ordem crescente de severidade:
+1. Acoplamento de Dados (comunicação por meio de parâmetros escalares).
+2. Acoplamento de Estrutura (dependência gerada pelo tipo de parâmetros estruturados).
+3. Acoplamento de Controle (parâmetros utilizados para controlar o comportamento de um módulo).
+4. Acoplamento Comum (comunicação por meio de dados globais compartilhados).
+5. Acoplamento de Conteúdo (um módulo acessa ou modifica diretamente a definição de outro módulo).
+Para software orientado a objetos, a noção de acoplamento não foi tratada com o mesmo rigor pelos pioneiros que estabeleceram as diretrizes principais desse paradigma. Há duas razões principais para essa negligência:
+1. No design estruturado, havia poucas diretrizes semânticas para decompor um sistema em subsistemas menores. Como consequência, aspectos sintáticos como tamanho, acoplamento etc. desempenhavam um papel crucial. Em contraste, no paradigma orientado a objetos, o critério principal para decomposição do sistema é o mapeamento de objetos do domínio do problema para classes ou subsistemas no modelo de análise/design, reduzindo a importância relativa dos critérios sintáticos.
+2. A análise e o design orientados a objetos buscam incorporar dados e funcionalidades relacionadas em objetos. Essa estratégia, por si só, reduz o acoplamento entre objetos. Portanto, controlar explicitamente o acoplamento não parece ser tão essencial quanto no design estruturado (especialmente no design top-down).
+No entanto, como a simples adoção de mecanismos orientados a objetos não garante automaticamente um acoplamento mínimo, há boas razões para estudar o acoplamento em sistemas orientados a objetos:
+1. Em muitos casos, dados ou operações não podem ser atribuídos inequivocamente a uma classe específica com base apenas em aspectos semânticos. Assim, os projetistas precisam de critérios adicionais para essas atribuições.
+2. Embora a introdução de classes como um meio poderoso de abstração de dados reduza o fluxo de dados entre unidades de abstração e, consequentemente, diminua o acoplamento total dentro de um sistema, o número de variações de interdependência aumenta em comparação aos sistemas convencionais. Isso ocorre devido à:
+   * Variedade de mecanismos (herança, delegação, relações de uso e posse etc.).
+   * Diversidade de módulos (classes e objetos, bem como funções e procedimentos em sistemas híbridos).
+Diferentes mecanismos podem, às vezes, ser usados de forma intercambiável. Por exemplo, a herança pode ser substituída por delegação, ou relações de uso podem ser substituídas por relações de posse. Cada uma dessas variações tem impactos distintos na qualidade do software, os quais devem ser investigados e medidos.
+Além disso, os princípios de encapsulamento e abstração de dados, embora fundamentais para a orientação a objetos, podem ser violados em diferentes graus dependendo da linguagem de programação subjacente. Isso leva a diferentes níveis de acoplamento efetivo, que devem ser considerados.
+Com esse espírito, vários pesquisadores tentaram adaptar a noção de acoplamento ao paradigma orientado a objetos, conforme será discutido na Seção A. Budd, por exemplo, afirma que:
+"Objetos de classes distintas devem ter o menor acoplamento possível, não apenas para torná-los mais compreensíveis, mas também para que possam ser facilmente extraídos de uma aplicação específica e reutilizados em novas situações."
+Portanto, o acoplamento parece ser ainda mais importante em sistemas orientados a objetos:
+* O acoplamento de objetos clientes a um objeto servidor pode introduzir dependências de mudança. Quanto mais forte o acoplamento, mais difíceis serão os impactos sobre os clientes sempre que um aspecto crucial do servidor for alterado.
+* Alto acoplamento entre dois objetos dificulta a compreensão de um deles de forma isolada. Em contrapartida, baixo acoplamento leva a objetos autônomos, que são fáceis de entender e manter (seguindo o princípio "KISS" – Keep It Simple & Stupid).
+* Alto acoplamento também aumenta a probabilidade de efeitos colaterais, onde erros em um objeto podem causar comportamento incorreto em outros objetos. Novamente, um baixo acoplamento facilita o rastreamento de erros, o que melhora a testabilidade e simplifica a depuração.
+Neste artigo, com base em uma noção geral de acoplamento, buscamos fornecer definições apropriadas para acoplamento e coesão em sistemas orientados a objetos e identificar um conjunto de dimensões que devem ser consideradas ao medir esses atributos.
+Ao analisar os efeitos do acoplamento, percebe-se que eles podem ser naturalmente divididos em duas classes, correspondentes a duas variantes distintas de acoplamento:
+1. Acoplamento a nível de objeto.
+2. Acoplamento a nível de classe.
+Embora o foco principal deste estudo seja o acoplamento, pois é um dos atributos internos mais importantes dos produtos de software, também devemos considerar a coesão devido à relação dual entre esses dois atributos.
+Otimizar um design apenas em relação ao acoplamento entre abstrações (módulos, classes, subsistemas etc.) poderia levar trivialmente a uma única abstração gigantesca sem qualquer acoplamento dentro do nível de abstração considerado. No entanto, essa solução extrema pode ser evitada ao considerar também o atributo antagonista: a coesão.
+Nos capítulos seguintes, apresentamos uma visão geral das abordagens atuais para definir e lidar com o acoplamento em sistemas orientados a objetos, discutindo questões que consideramos não resolvidas de maneira adequada na literatura e propondo um modelo abrangente para medi-lo.
+II. PRELIMINARES
+Nesta seção, fornecemos alguns conceitos fundamentais que serão utilizados ao longo do restante deste artigo. A Definição 1 esclarece alguns termos da terminologia orientada a objetos, enquanto as definições subsequentes oferecem uma noção preliminar de acoplamento em sistemas orientados a objetos. Essas definições serão refinadas na Seção III.
+Definição 1 (Conceitos Orientados a Objetos)
+Utilizaremos os termos objeto e classe de acordo com a terminologia usual da orientação a objetos:
+* Uma classe fornece a definição da estrutura (variáveis de instância) e do comportamento (métodos) de entidades semelhantes.
+* Um objeto é uma instância de sua respectiva classe.
+* As classes podem ser organizadas em hierarquias de herança, possuindo relações de superclasses e subclasses.
+Um objeto que acessa outro objeto será chamado de cliente, enquanto o objeto acessado será denominado servidor. As classes correspondentes serão chamadas de classe cliente e classe servidora, respectivamente. Essa definição também se aplica quando um objeto acessa partes herdadas de sua própria superclasse (que, nesse caso, será a classe servidora).
+O termo acesso à interface de uma classe refere-se ao envio de mensagens que seguem o protocolo de métodos da classe. Dessa forma, as variáveis de instância nunca podem ser lidas ou modificadas diretamente. Já o termo acesso à implementação descreve a situação em que uma variável de instância é acessada diretamente, seja por meio de referência direta (uso do nome da variável) ou indiretamente por meio de um método que retorna uma referência a essa variável.
+Definição 2 (Fundamentação Ontológica do Acoplamento)
+Wand e Weber [22] forneceram uma fundamentação ontológica para o conceito de acoplamento, conforme a seguinte definição:
+"O histórico de um elemento é definido como o conjunto de pares ordenados <t, s>, onde cada par representa o estado s do elemento em um determinado momento t. Dois elementos são considerados acoplados se, e somente se, o histórico de pelo menos um deles depende do histórico do outro."
+Com base nessa definição, buscamos formular uma noção de acoplamento em sistemas orientados a objetos que seja adequada para definir uma métrica de intensidade do acoplamento. Assim, todas as variações de acoplamento devem ser contempladas, pois diferentes tipos de acoplamento podem diferir em relação a:
+* Sua contribuição para a medida geral de acoplamento.
+* A fase do ciclo de vida do desenvolvimento (projeto, implementação, manutenção) em que são mais relevantes.
+Lembrando que um histórico, no sentido acima, resulta de uma série de mudanças de estado, identificamos duas grandes categorias de estado e mudança de estado:
+1. Estado de um objeto: Em um sistema orientado a objetos, o estado de um objeto pode mudar durante a execução do programa (tempo de execução).
+2. Estado da implementação de um objeto: O estado da implementação de um objeto (ou seja, sua especificação de classe e o código dos métodos correspondentes) pode mudar ao longo do ciclo de vida do desenvolvimento.
+Com base nisso, distinguimos dois tipos principais de acoplamento:
+Definição 3 (Acoplamento a Nível de Objeto - OLC)
+O acoplamento a nível de objeto (Object Level Coupling - OLC) representa o acoplamento resultante de dependências de estado entre objetos durante o tempo de execução do sistema.
+Definição 4 (Acoplamento a Nível de Classe - CLC)
+O acoplamento a nível de classe (Class Level Coupling - CLC) representa o acoplamento resultante de dependências na implementação de um sistema.
+Embora, na maioria dos casos, o acoplamento a nível de objeto implique acoplamento a nível de classe, é essencial distinguir ambos os tipos e suas respectivas intensidades. Estabelecer métricas para medir esses diferentes tipos de acoplamento será nosso principal objetivo a partir da próxima seção.
+III. ACOPLAMENTO
+A. Revisão de Trabalhos Anteriores
+Chidamber e Kemerer [4] forneceram a primeira definição formal de acoplamento entre classes. Transformando a definição de acoplamento proposta por Wand e Weber [22], Chidamber e Kemerer concluíram:
+"Qualquer evidência de um método de um objeto utilizando métodos ou variáveis de instância de outro objeto constitui acoplamento."
+Como métrica de acoplamento, eles definiram CBO (Coupling Between Objects – Acoplamento Entre Objetos), proporcional ao número de acoplamentos não relacionados à herança com outras classes.
+Embora essa ideia tenha sido amplamente aceita na literatura e até recentemente republicada [5], algumas deficiências foram identificadas. Especificamente, percebeu-se que essa métrica não se ajusta bem a níveis mais altos de modularização [17]. Além disso, podemos destacar os seguintes pontos:
+* O acoplamento é definido como um atributo de pares de objetos, mas a métrica é agregada ao total de acoplamentos que uma classe tem com outras classes, assumindo implicitamente que todos os acoplamentos têm a mesma intensidade. Isso não é necessariamente verdade. Por exemplo, a troca de mensagens entre objetos pode se misturar com acessos diretos a variáveis de instância externas, sendo esta última uma das formas mais prejudiciais de acoplamento.
+* Não está claro se mensagens enviadas a uma parte do próprio objeto (self) contribuem para o CBO ou não. Estritamente seguindo a definição de [22], mensagens para self (ou partes dele) não alteram o histórico de um objeto externo e, portanto, não constituem acoplamento. No entanto, isso pode levar a um certo grau de acoplamento a nível de classe, não capturado pela definição de [4].
+* Ao negligenciar explicitamente conexões relacionadas à herança, Chidamber e Kemerer excluem da métrica contribuições associadas ao acesso direto a variáveis de instância herdadas de superclasses, um tipo de acoplamento amplamente considerado um dos piores [14][20][24].
+Chidamber e Kemerer também definiram RFC (Response For a Class – Resposta Para uma Classe) como a união do protocolo que uma classe oferece aos seus clientes e os protocolos que ela solicita de outras classes. Essa métrica mede o potencial total de comunicação e está, portanto, intimamente relacionada ao acoplamento, não sendo independente do CBO.
+Coad e Yourdon, em [6], dedicaram três parágrafos para enfatizar a importância do acoplamento e seu impacto na dependência de mudanças dentro do sistema, embora sem fornecer uma métrica específica. Curiosamente, eles diferenciam conexões entre objetos e conexões entre classes, utilizando este último termo apenas para se referir a relações de generalização entre classes.
+Lieberherr et al. propuseram um conjunto de diretrizes para um "bom" design orientado a objetos, incluindo algumas regras para controlar aspectos do acoplamento (Lei de Demeter [14][15]). No entanto, essas diretrizes são formuladas como regras rígidas e não como uma métrica de intensidade do acoplamento. LeJacq desenvolveu essa diretriz e propôs uma métrica ordinal correspondente [12].
+Budd tentou reinterpretar os conceitos clássicos de acoplamento e coesão no contexto das linguagens orientadas a objetos [3]. Ele introduziu os conceitos de Acoplamento de Dados Interno e Acoplamento de Dados Global, que parecem se ajustar bem ao paradigma orientado a objetos. No entanto, em sistemas orientados a objetos, onde o principal mecanismo de comunicação é a troca de mensagens entre objetos, o acoplamento de dados é menos relevante. O mesmo se aplica ao Acoplamento de Sequência de Controle, que parece ainda menos adequado para o design orientado a objetos. De fato, se tal situação ocorrer, isso pode ser um indicativo de um design ruim.
+Curiosamente, Budd não discute o Acoplamento de Estrutura, embora pareça ser o mais relevante para a programação orientada a objetos.
+A discussão de Budd revela uma limitação geral encontrada na literatura: tradicionalmente, as operações são consideradas aplicáveis apenas a dados no sentido clássico, e não a objetos. No design estruturado, os dados geralmente pertencem a tipos básicos com um protocolo estável, onde não há dependências de mudanças em relação à sua implementação. Em contraste, em sistemas orientados a objetos, o uso de tipos complexos de dados resulta não apenas em acoplamento com os dados, mas também com os próprios tipos de dados (ou seja, acoplamento a nível de classe).
+________________
+
+
+B. Uma Estrutura Abrangente para Medir o Acoplamento em Sistemas Orientados a Objetos
+Com base na discussão acima, propomos um modelo para medir o acoplamento em sistemas orientados a objetos. O design dessa estrutura busca evitar as deficiências identificadas na literatura, ao mesmo tempo em que incorpora os principais resultados das pesquisas existentes.
+Diferentemente das abordagens anteriores, enfatizamos a distinção entre acoplamento entre objetos (OLC) e acoplamento entre classes (CLC).
+* CLC é especialmente relevante para atividades de manutenção e mudança dentro de uma aplicação: modificações em uma classe servidora podem exigir alterações em classes clientes, impactando a reutilização.
+* OLC, por outro lado, é mais relevante para atividades relacionadas à execução, como testes e depuração.
+A seguir, buscamos definir medidas para CLC e OLC.
+1. Acoplamento a Nível de Classe (CLC)
+Para refinar a definição preliminar de CLC (Definição 4), primeiro precisamos esclarecer o conceito de estado de uma classe:
+Definição 5: O estado de uma classe refere-se à sua definição e ao código de seus métodos, ou seja, a uma versão específica de sua implementação.
+Portanto, mudanças em uma classe exigem modificações em todas as classes que possuem dependências com ela, levando à seguinte reformulação:
+Definição 4’: O acoplamento a nível de classe representa o acoplamento resultante de dependências de estado entre classes ao longo do ciclo de vida do desenvolvimento.
+Para avaliar a intensidade do acoplamento entre uma classe cliente (CC) e uma classe servidora (SC), consideramos os seguintes fatores:
+1. Estabilidade de SC: Classes estáveis raramente mudam, reduzindo a necessidade de alterações em CC. Classes instáveis exigem maior acoplamento.
+2. Tipo de acesso a SC: CC pode acessar apenas a interface de SC ou acessar sua implementação diretamente. Acesso direto aumenta o acoplamento.
+3. Escopo do acesso: Quanto mais amplo o uso de SC dentro de CC, maior o acoplamento.
+________________
+
+
+2. Acoplamento a Nível de Objeto (OLC)
+Para definir OLC, consideramos o seguinte critério:
+Definição 6: Se um objeto M pertence a um objeto A e só pode existir dentro de A (agregação exclusiva), então M é chamado de objeto nativo de A.
+Mensagens enviadas a objetos nativos não contribuem para o OLC. Assim, podemos reformular a definição de Chidamber e Kemerer:
+Teorema: Qualquer evidência de um método de um objeto utilizando métodos ou variáveis de um objeto não nativo constitui acoplamento a nível de objeto (OLC).
+O acoplamento a nível de objeto é influenciado por:
+* Tipo de acesso ao objeto externo.
+* Escopo do uso do objeto externo.
+* Complexidade da interface do objeto externo.
+IV. COESÃO
+A coesão é um atributo fundamental relacionado à qualidade da abstração capturada por uma classe. Boas abstrações geralmente apresentam alta coesão.
+A métrica original de coesão para sistemas orientados a objetos, proposta por Chidamber e Kemerer [4] (e posteriormente esclarecida pelos próprios autores em [5]), representa uma medida inversa de coesão. Eles definiram a métrica LCOM (Lack of Cohesion in Methods – Falta de Coesão nos Métodos) como o número de pares de métodos que operam em conjuntos distintos de variáveis de instância, reduzido pelo número de pares de métodos que compartilham pelo menos uma variável de instância.
+A definição dada em [5] é reproduzida abaixo:
+"Considere uma classe C1 com n métodos M1, M2, ..., Mn. Seja:
+* {Ij} o conjunto de variáveis de instância utilizadas pelo método Mj.
+* Existem n conjuntos dessa forma: {I1}, ..., {In}.
+* Seja P o conjunto de pares de métodos que operam sobre conjuntos disjuntos de variáveis de instância:
+   * P = {(Ii, Ij) | Ii ∩ Ij = ∅}
+* Seja Q o conjunto de pares de métodos que compartilham pelo menos uma variável de instância:
+   * Q = {(Ii, Ij) | Ii ∩ Ij ≠ ∅}
+* Se todos os conjuntos {I1}, ..., {In} forem vazios, então P = ∅.
+A métrica LCOM é definida como:
+* LCOM = |P| - |Q|, se |P| > |Q|
+* LCOM = 0, caso contrário.
+Por exemplo, considere a seguinte classe X:
+class X {  
+   int A, B, C, D, E, F;  
+   void f() { ... usa A, B, C ... }  
+   void g() { ... usa D, E ... }  
+   void h() { ... usa E, F ... }  
+};
+	
+
+Nesta classe:
+* Existem dois pares de métodos que não compartilham variáveis de instância: (f, g) e (f, h).
+* Existe um par de métodos que compartilham uma variável de instância: (g, h) (compartilham E).
+* Portanto, LCOM = 2 - 1 = 1.
+Embora o princípio por trás dessa definição pareça fazer sentido, a métrica resultante apresenta diversas anomalias em relação à compreensão intuitiva do atributo. Algumas das principais serão explicadas a seguir.
+________________
+
+
+A. Problemas na Definição de LCOM
+Considere as duas classes abaixo, onde cada diagrama de Venn representa um método com o conjunto de variáveis de instância que ele acessa:
+Caso I
+   (M1) (M2)
+  {A,B} {C,D}
+	
+
+Caso II
+   (M1) (M2) (M3)
+  {A,B} {C,D} {E,F}
+	
+
+Aplicando a definição de LCOM:
+* No Caso I, LCOM = 2 - 1 = 1.
+* No Caso II, há mais métodos sem interseção, aumentando o valor da métrica LCOM = 4 - 2 = 2.
+No entanto, intuitivamente, ambos os casos apresentam a mesma falta de coesão. A adição de um método no Caso II deveria, no máximo, manter a métrica estável ou até reduzi-la, mas não aumentá-la.
+Além disso, se removermos um dos métodos interligados no Caso I, o LCOM permanece o mesmo, mesmo que a classe tenha se tornado menos coesa. Isso representa uma falha da métrica em capturar corretamente a noção de coesão.
+Outro problema é que a métrica depende do número de métodos (n). Consideremos uma classe estruturada da seguinte forma:
+   M1 → usa {A}  
+  M2 → usa {B}  
+  M3 → usa {C}  
+  ...  
+  Mn → usa {Z}
+	
+
+O cálculo de LCOM para essa classe leva a um aumento exponencial da métrica, mesmo que a classe possa ser quebrada em componentes menores com o mesmo problema.
+Dessa forma, LCOM não é uma métrica estável e apresenta anomalias em diferentes cenários, tornando sua aplicação prática questionável.
+________________
+
+
+B. Melhorando a Métrica de Coesão
+Li e Henry [13] melhoraram a versão original de LCOM, definindo-a da seguinte forma:
+"LCOM é o número de subconjuntos disjuntos de métodos locais dentro da classe. Nenhum desses subconjuntos deve se sobrepor. Dois métodos pertencem ao mesmo subconjunto se compartilharem pelo menos uma variável de instância."
+Essa definição reformulada permite:
+* Uma interpretação mais clara da coesão, já que classes altamente coesas tendem a ter apenas um subconjunto de métodos interligados.
+* LCOM varia de 1 até N, onde N é um número positivo.
+* Se LCOM = 1, significa que a classe é totalmente coesa.
+* Se LCOM > 1, há múltiplos subconjuntos, indicando que a classe pode ser dividida em partes menores.
+Por exemplo, para os casos I e II anteriores, LCOM = 2 para ambos, o que está de acordo com nossa expectativa intuitiva.
+No entanto, essa reformulação ainda não é perfeita. Ela não considera métodos que:
+1. Não acessam variáveis de instância diretamente.
+2. Apenas chamam outros métodos da própria classe.
+Um exemplo clássico disso é:
+class Lista {
+public:
+   int tamanho() const { return vazio() ? 0 : 1 + cauda().tamanho(); }
+};
+	
+
+O método tamanho() depende logicamente de vazio() e cauda(), mas não acessa diretamente variáveis de instância. Nesse caso, a métrica de coesão pode subestimar a real coesão da classe.
+________________
+
+
+C. Uma Nova Abordagem Baseada em Grafos
+Para resolver essas falhas, propomos uma abordagem baseada em teoria dos grafos:
+1. Representamos a classe como um grafo, onde:
+   * Os métodos são os nós.
+   * Uma aresta é criada entre dois métodos se eles compartilham uma variável de instância OU se um método chama outro.
+2. O número de componentes conectados no grafo representa LCOM.
+3. Quanto mais conexões internas no grafo, maior a coesão.
+Essa abordagem resolve os problemas anteriores, pois:
+* Considera chamadas entre métodos, além do compartilhamento de variáveis.
+* Permite medir graus diferentes de coesão, e não apenas "sim ou não".
+Na prática, esse modelo poderia ser aplicado em ferramentas automáticas de análise de código, fornecendo uma métrica mais precisa e realista da coesão de uma classe.
+________________
+
+
+Conclusão
+Embora a métrica original de LCOM tenha sido um primeiro passo importante para medir a coesão em sistemas orientados a objetos, identificamos diversas anomalias e limitações em sua definição.
+A versão melhorada de Li e Henry representa um avanço, mas ainda apresenta deficiências em certos cenários.
+Propomos um modelo baseado em grafos para calcular coesão de forma mais precisa, considerando tanto o compartilhamento de variáveis quanto as dependências entre métodos.
+V. CONCLUSÕES E TRABALHOS FUTUROS
+
+
+Tendo introduzido uma estrutura para uma reunião abrangente
+ric para acoplamento em sistemas orientados a objetos em ambos, objeto e
+
+
+níveis de classe, fomos capazes de identificar uma métrica ordinal básica para
+
+
+a contribuição que certos construtos elementares fornecem para
+implorando.
+
+
+Como uma aplicação da estrutura, considere o trade-off
+
+
+discutido em [1], ou seja, se usar um objeto (não nativo) é preferível
+capaz de conter um objeto. Denotando a classe de tal
+
+
+objeto por X, descobrimos na Tabela 1 da nossa estrutura que se X
+é estável, acessar uma variável de instância deste tipo X produz
+força de acoplamento 1 para a caixa de contenção. O caso de uso é
+dado como 1+I na célula da segunda linha/primeira coluna da Tabela 3.
+Assim, a contenção é preferível neste caso.
+Vários problemas em aberto permanecem por resolver:
+
+
+Unificando ambos os conjuntos de valores conforme definido pela Tabela 1 e Ta-
+tabela 2, a fim de obter uma escala ordinal completa dentro do
+
+
+estrutura de acoplamento é obviamente desejável. Para alcançar consistência
+resultados satisfatórios e satisfatórios, dados empíricos obtidos de
+projetos de engenharia de software da vida precisam ser analisados ​​com atenção
+respeito à influência das métricas propostas no exterior
+
+
+atributos do produto. Isto aplica-se também à medida de coesão certezas apresentadas.
