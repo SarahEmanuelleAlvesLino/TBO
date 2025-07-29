@@ -121,6 +121,15 @@ int main(){
 
             //Compressão e Descompressão
             case 3:{
+                cout << endl << "---------------------------- Compressão e Descompressão -------------------------------" << endl;
+                cout << "______________________________________________________________________"<< endl;
+                cout << "|                                                                    |" << endl;
+                cout << "| >> Para funcionar a compressão e descompressão,                    |" << endl;
+                cout << "|    está em outro arquivo com a main                                |" << endl;
+                cout << "|                                                                    |" << endl;
+                cout << "|____________________________________________________________________|" << endl;
+
+                return 0; // Retorna 0 para indicar que a compressão e descompressão não foram implementadas aqui
 
             }
                 break;
@@ -137,6 +146,7 @@ int main(){
 
         }while (op != 4);
     
+        return 0;
 
 
 }
